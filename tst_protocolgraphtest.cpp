@@ -81,6 +81,12 @@ void ProtocolGraphTest::ifThenElseProcotol_branch1() {
         std::shared_ptr<ProtocolGraph> protocol = createsIfThenElseProtocol(1);
         qDebug() << protocol->toString().c_str();
 
+        for(int ctrId : protocol->getControlOperations()) {
+            std::shared_ptr<ControlNode> ctrPtr = protocol->getControlNode(ctrId);
+            QVERIFY2(ctrPtr->getEndBlockId().back() == 11,
+                     std::string(std::to_string(ctrId) + " end block is not 11 is" + std::to_string(ctrPtr->getEndBlockId().back())).c_str());
+        }
+
         std::vector<double> measureValue = {};
         StringActuatorsInterface* actuatorInterfaz = new StringActuatorsInterface(measureValue);
         executeProtocol(protocol,actuatorInterfaz);
@@ -144,6 +150,12 @@ void ProtocolGraphTest::whileIfProtocol() {
         std::shared_ptr<ProtocolGraph> protocol = createsWhileIfProtocol();
         qDebug() << protocol->toString().c_str();
 
+        for(int ctrId : protocol->getControlOperations()) {
+            std::shared_ptr<ControlNode> ctrPtr = protocol->getControlNode(ctrId);
+            QVERIFY2((ctrPtr->getEndBlockId().back() == 9) || (ctrPtr->getEndBlockId().back() == 11),
+                     std::string(std::to_string(ctrId) + " end block is not 11 or 9 is" + std::to_string(ctrPtr->getEndBlockId().back())).c_str());
+        }
+
         std::vector<double> measureValue = {};
         StringActuatorsInterface* actuatorInterfaz = new StringActuatorsInterface(measureValue);
         executeProtocol(protocol,actuatorInterfaz);
@@ -164,6 +176,12 @@ void ProtocolGraphTest::nestedIfsProtocol() {
     try {
         std::shared_ptr<ProtocolGraph> protocol = createsNestedIfsProtocol();
         qDebug() << protocol->toString().c_str();
+
+        for(int ctrId : protocol->getControlOperations()) {
+            std::shared_ptr<ControlNode> ctrPtr = protocol->getControlNode(ctrId);
+            QVERIFY2(ctrPtr->getEndBlockId().back() == 12,
+                     std::string(std::to_string(ctrId) + " end block is not 12 is" + std::to_string(ctrPtr->getEndBlockId().back())).c_str());
+        }
 
         StringActuatorsInterface* actuatorInterfaz = new StringActuatorsInterface(std::vector<double>{4});
         executeProtocol(protocol,actuatorInterfaz);
@@ -222,6 +240,12 @@ void ProtocolGraphTest::sequentialIfsProtocol() {
         std::shared_ptr<ProtocolGraph> protocol = createsSequentialIfsProtocol();
         qDebug() << protocol->toString().c_str();
 
+        for(int ctrId : protocol->getControlOperations()) {
+            std::shared_ptr<ControlNode> ctrPtr = protocol->getControlNode(ctrId);
+            QVERIFY2((ctrPtr->getEndBlockId().back() == 8) || (ctrPtr->getEndBlockId().back() == 14),
+                     std::string(std::to_string(ctrId) + " end block is not 14 or 8 is" + std::to_string(ctrPtr->getEndBlockId().back())).c_str());
+        }
+
         StringActuatorsInterface* actuatorInterfaz = new StringActuatorsInterface(std::vector<double>{4});
         executeProtocol(protocol,actuatorInterfaz);
 
@@ -266,6 +290,12 @@ void ProtocolGraphTest::IfsWhilesProtocol() {
     try {
         std::shared_ptr<ProtocolGraph> protocol = createsIfsWhilesProtocol();
         qDebug() << protocol->toString().c_str();
+
+        for(int ctrId : protocol->getControlOperations()) {
+            std::shared_ptr<ControlNode> ctrPtr = protocol->getControlNode(ctrId);
+            QVERIFY2(ctrPtr->getEndBlockId().back() == 11,
+                     std::string(std::to_string(ctrId) + " end block is not 11 is" + std::to_string(ctrPtr->getEndBlockId().back())).c_str());
+        }
 
         StringActuatorsInterface* actuatorInterfaz = new StringActuatorsInterface(std::vector<double>{1});
         executeProtocol(protocol,actuatorInterfaz);
