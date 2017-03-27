@@ -29,32 +29,32 @@ units::Volume StringActuatorsInterface::getVirtualVolume(int sourceId) {
 }
 
 void StringActuatorsInterface::loadContainer(int sourceId, units::Volume initialVolume) {
-    stream << "loadContainer(" << sourceId << "," << initialVolume.to(units::l) << ");";
+    stream << "loadContainer(" << sourceId << "," << initialVolume.to(units::ml) << "ml);";
 }
 
 double StringActuatorsInterface::measureOD(int sourceId, units::Time duration, units::Frequency measurementFrequency, units::Length wavelength) {
-    stream << "measureOD(" << sourceId << "," << duration.to(units::s) << "," << measurementFrequency.to(units::Hz) << ","
-           << wavelength.to(units::nm) << ");";
+    stream << "measureOD(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz,"
+           << wavelength.to(units::nm) << "nm);";
     return getNextReadValue();
 }
 
 units::Temperature StringActuatorsInterface::measureTemperature(int sourceId, units::Time duration, units::Frequency measurementFrequency) {
-    stream << "measureTemperature(" << sourceId << "," << duration.to(units::s) << "," << measurementFrequency.to(units::Hz) << ");";
+    stream << "measureTemperature(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz);";
     return getNextReadValue()*units::C;
 }
 
 units::LuminousIntensity StringActuatorsInterface::measureLuminiscense(int sourceId, units::Time duration, units::Frequency measurementFrequency) {
-    stream << "measureLuminiscense(" << sourceId << "," << duration.to(units::s) << "," << measurementFrequency.to(units::Hz) << ");";
+    stream << "measureLuminiscense(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz);";
     return getNextReadValue()*units::cd;
 }
 
 units::Volume StringActuatorsInterface::measureVolume(int sourceId, units::Time duration, units::Frequency measurementFrequency) {
-    stream << "measureVolume(" << sourceId << "," << duration.to(units::s) << "," << measurementFrequency.to(units::Hz) << ");";
+    stream << "measureVolume(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz);";
     return getNextReadValue()*units::ml;
 }
 
 units::LuminousIntensity StringActuatorsInterface::measureFluorescence(int sourceId, units::Time duration, units::Frequency measurementFrequency) {
-    stream << "measureFluorescence(" << sourceId << "," << duration.to(units::s) << "," << measurementFrequency.to(units::Hz) << ");";
+    stream << "measureFluorescence(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz);";
     return getNextReadValue()*units::cd;
 }
 
