@@ -51,7 +51,8 @@ private Q_SLOTS:
     void sequentialIfsProtocol();
     void IfsWhilesProtocol();
     void isPhysical();
-    void checkOperations();
+    void checkRandom();
+    void opertationsProtocol();
 };
 
 ProtocolGraphTest::ProtocolGraphTest()
@@ -342,7 +343,31 @@ void ProtocolGraphTest::isPhysical() {
     }
 }
 
-void ProtocolGraphTest::checkOperations() {
+void ProtocolGraphTest::checkRandom() {
+    try {
+        std::shared_ptr<MathematicOperable> random = MF::random();
+        std::shared_ptr<MathematicOperable> randomInt = MF::random(0,10);
+
+        for(int i = 0; i < 5; i++) {
+            double randomValue = random->getValue();
+            double randomIntValue = randomInt->getValue();
+
+            qDebug() << randomValue;
+            qDebug() << randomIntValue;
+
+            QVERIFY2(randomValue >= 0.0 && randomValue <= 1.0,
+                     std::string("random value: " + std::to_string(randomValue) + " is not between [0,1]").c_str());
+            QVERIFY2(Utils::isWhole(randomIntValue),
+                     std::string("random int value: " + std::to_string(randomIntValue) + " is not an integer").c_str());
+            QVERIFY2(randomIntValue >= 0 && randomIntValue <= 10,
+                     std::string("random int value: " + std::to_string(randomIntValue) + " is not between [0,10]").c_str());
+        }
+    } catch (std::exception & e) {
+        QFAIL(std::string("Exception occired, message:" + std::string(e.what())).c_str());
+    }
+}
+
+void ProtocolGraphTest::opertationsProtocol() {
     try {
         std::shared_ptr<ProtocolGraph> protocol = createOperationsProtocol();
         qDebug() << protocol->toString().c_str();
@@ -352,10 +377,13 @@ void ProtocolGraphTest::checkOperations() {
         executeProtocol(protocol,actuatorInterfaz);
 
         std::string generatedOutput = actuatorInterfaz->getStream().str();
+        std::string expectedOutput = "setTimeStep(1100ms);loadContainer(0,1ml);loadContainer(0,0ml);loadContainer(0,1ml);loadContainer(0,0ml);loadContainer(0,1ml);";
+        qDebug() << "generated: " << generatedOutput.c_str();
+        qDebug() << "expectd:" << expectedOutput.c_str();
 
-        qDebug() << generatedOutput.c_str();
-
-        QVERIFY(true);
+        QVERIFY2(expectedOutput.compare(generatedOutput) == 0,
+                 "expected and generated outputs are not the same, check debug printed values for more info");
+        delete actuatorInterfaz;
     } catch (std::exception & e) {
         QFAIL(std::string("Exception occired, message:" + std::string(e.what())).c_str());
     }
@@ -829,17 +857,19 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createIsPhysicalProtocol() {
     return graphPtr;
 }
 
+
 /*
- * LC(0,random()ml)
- * LC(1,randomInt(0,10)ml)
- * LC(0,random()ml)
- * LC(1,randomInt(0,10)ml)
- * LC(0,random()ml)
- * LC(1,randomInt(0,10)ml)
- * LC(0,random()ml)
- * LC(1,randomInt(0,10)ml)
- * LC(0,random()ml)
- * LC(1,randomInt(0,10)ml)
+ * even = isEven(2) ? 1 : 0;
+ * whole = isWhole(2.1) ? 1 : 0;
+ * prime2 = isPrime(2) ? 1 : 0;
+ * prime770 = isPrime(770) ? 1 : 0;
+ * prime503 = isPrime(503) ? 1 : 0;
+ *
+ * LC(0,even ml);
+ * LC(0,whole ml);
+ * LC(0,prime2 ml);
+ * LC(0,prime770 ml);
+ * LC(0,prime503 ml);
  */
 std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createOperationsProtocol() {
     std::shared_ptr<ProtocolGraph> graphPtr = std::make_shared<ProtocolGraph>("operations");
@@ -847,13 +877,36 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createOperationsProtocol() {
     int setTimeS = graphPtr->emplaceSetTimeStep(MF::getNum(1100), units::ms);
     graphPtr->setStartNode(setTimeS);
 
-    for(int i = 0; i < 5; i++) {
-        int op1 = graphPtr->emplaceLoadContainer("0", MF::random(), units::ml);
-        graphPtr->appendOperations(op1);
+    int evenOp = graphPtr->emplaceAssignation("even", MF::test(BF::isEven(MF::getNum(2.0)), MF::getNum(1.0), MF::getNum(0.0)));
+    graphPtr->appendOperations(evenOp);
 
-        int op2 = graphPtr->emplaceLoadContainer("1", MF::random(0,10), units::ml);
-        graphPtr->appendOperations(op2);
-    }
+    int wholeOP = graphPtr->emplaceAssignation("whole", MF::test(BF::isWhole(MF::getNum(2.1)), MF::getNum(1.0), MF::getNum(0.0)));
+    graphPtr->appendOperations(wholeOP);
+
+    int primeOP2 = graphPtr->emplaceAssignation("prime2", MF::test(BF::isPrime(MF::getNum(2.0)), MF::getNum(1.0), MF::getNum(0.0)));
+    graphPtr->appendOperations(primeOP2);
+
+    int primeOP770 = graphPtr->emplaceAssignation("prime770", MF::test(BF::isPrime(MF::getNum(770.0)), MF::getNum(1.0), MF::getNum(0.0)));
+    graphPtr->appendOperations(primeOP770);
+
+    int primeOP503 = graphPtr->emplaceAssignation("prime503", MF::test(BF::isPrime(MF::getNum(503.0)), MF::getNum(1.0), MF::getNum(0.0)));
+    graphPtr->appendOperations(primeOP503);
+
+    int LC1 = graphPtr->emplaceLoadContainer("0", graphPtr->getVariable("even"), units::ml);
+    graphPtr->appendOperations(LC1);
+
+    int LC2 = graphPtr->emplaceLoadContainer("0", graphPtr->getVariable("whole"), units::ml);
+    graphPtr->appendOperations(LC2);
+
+    int LC3 = graphPtr->emplaceLoadContainer("0", graphPtr->getVariable("prime2"), units::ml);
+    graphPtr->appendOperations(LC3);
+
+    int LC4 = graphPtr->emplaceLoadContainer("0", graphPtr->getVariable("prime770"), units::ml);
+    graphPtr->appendOperations(LC4);
+
+    int LC5 = graphPtr->emplaceLoadContainer("0", graphPtr->getVariable("prime503"), units::ml);
+    graphPtr->appendOperations(LC5);
+
     return graphPtr;
 }
 
