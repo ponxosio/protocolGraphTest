@@ -15,12 +15,24 @@ void StringActuatorsInterface::applyLigth(const std::string & sourceId, units::L
     stream << "applyLight(" << sourceId << "," << wavelength.to(units::nm) << "nm," << intensity.to(units::cd) << "cd);";
 }
 
+void StringActuatorsInterface::stopApplyLigth(const std::string & sourceId) {
+    stream << "stopApplyLight(" << sourceId << ");";
+}
+
 void StringActuatorsInterface::applyTemperature(const std::string & sourceId, units::Temperature temperature) {
     stream << "applyTemperature(" << sourceId << "," << temperature.to(units::C) << "Cº);";
 }
 
+void StringActuatorsInterface::stopApplyTemperature(const std::string & sourceId) {
+    stream << "stopApplyTemperature(" << sourceId << ");" ;
+}
+
 void StringActuatorsInterface::stir(const std::string & idSource, units::Frequency intensity) {
     stream << "stir(" << idSource << "," << intensity.to(units::Hz) << "Hz);";
+}
+
+void StringActuatorsInterface::stopStir(const std::string & idSource) {
+    stream << "stopStir(" << idSource << ");";
 }
 
 units::Volume StringActuatorsInterface::getVirtualVolume(const std::string & sourceId) {
@@ -32,49 +44,69 @@ void StringActuatorsInterface::loadContainer(const std::string & sourceId, units
     stream << "loadContainer(" << sourceId << "," << initialVolume.to(units::ml) << "ml);";
 }
 
-double StringActuatorsInterface::measureOD(
+void StringActuatorsInterface::startMeasureOD(
         const std::string & sourceId,
         units::Time duration, units::Frequency measurementFrequency,
         units::Length wavelength)
 {
     stream << "measureOD(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz,"
            << wavelength.to(units::nm) << "nm);";
+}
+
+double StringActuatorsInterface::getMeasureOD(const std::string & sourceId) {
+    stream << "getMeasureOD(" << sourceId << ");";
     return getNextReadValue();
 }
 
-units::Temperature StringActuatorsInterface::measureTemperature(
+void StringActuatorsInterface::startMeasureTemperature(
         const std::string & sourceId,
         units::Time duration,
         units::Frequency measurementFrequency)
 {
     stream << "measureTemperature(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz);";
+}
+
+units::Temperature StringActuatorsInterface::getMeasureTemperature(const std::string & sourceId) {
+    stream << "getMeasureTemperature(" << sourceId << ");";
     return getNextReadValue()*units::C;
 }
 
-units::LuminousIntensity StringActuatorsInterface::measureLuminiscense(
+void StringActuatorsInterface::startMeasureLuminiscense(
         const std::string & sourceId,
         units::Time duration,
         units::Frequency measurementFrequency)
 {
     stream << "measureLuminiscense(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz);";
+}
+
+units::LuminousIntensity StringActuatorsInterface::getMeasureLuminiscense(const std::string & sourceId) {
+    stream << "getMeasureLuminiscense(" << sourceId << ");";
     return getNextReadValue()*units::cd;
 }
 
-units::Volume StringActuatorsInterface::measureVolume(
+void StringActuatorsInterface::startMeasureVolume(
         const std::string & sourceId,
         units::Time duration,
         units::Frequency measurementFrequency)
 {
     stream << "measureVolume(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz);";
+}
+
+units::Volume StringActuatorsInterface::getMeasureVolume(const std::string & sourceId) {
+    stream << "getMeasureVolume(" << sourceId << ");";
     return getNextReadValue()*units::ml;
 }
 
-units::LuminousIntensity StringActuatorsInterface::measureFluorescence(
+void StringActuatorsInterface::startMeasureFluorescence(
         const std::string & sourceId,
         units::Time duration,
         units::Frequency measurementFrequency)
 {
     stream << "measureFluorescence(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz);";
+}
+
+units::LuminousIntensity StringActuatorsInterface::getMeasureFluorescence(const std::string & sourceId) {
+    stream << "getMeasureFluorescence(" << sourceId << ");";
     return getNextReadValue()*units::cd;
 }
 

@@ -33,11 +33,12 @@ private:
     std::shared_ptr<ProtocolGraph> createsTurbidostatProtocol();
     std::shared_ptr<ProtocolGraph> createsIfThenElseProtocol(int switchValue);
     std::shared_ptr<ProtocolGraph> createsWhileIfProtocol();
-    std::shared_ptr<ProtocolGraph> createsNestedIfsProtocol();
-    std::shared_ptr<ProtocolGraph> createsSequentialIfsProtocol();
-    std::shared_ptr<ProtocolGraph> createsIfsWhilesProtocol();
+    std::shared_ptr<ProtocolGraph> createsNestedIfsProtocol(int & endBlockId);
+    std::shared_ptr<ProtocolGraph> createsSequentialIfsProtocol(int & eb1, int & eb2);
+    std::shared_ptr<ProtocolGraph> createsIfsWhilesProtocol(int & eb);
     std::shared_ptr<ProtocolGraph> createIsPhysicalProtocol();
     std::shared_ptr<ProtocolGraph> createOperationsProtocol();
+    std::shared_ptr<ProtocolGraph> createFinishProtocol();
 
     void executeProtocol(std::shared_ptr<ProtocolGraph> protocol,ActuatorsExecutionInterface* actuatorInterfaz);
 
@@ -53,6 +54,7 @@ private Q_SLOTS:
     void isPhysical();
     void checkRandom();
     void opertationsProtocol();
+    void finishProtocol();
 };
 
 ProtocolGraphTest::ProtocolGraphTest()
@@ -70,7 +72,7 @@ void ProtocolGraphTest::iterateOverProtocol()
         executeProtocol(protocol,actuatorInterfaz);
 
         std::string generatedOutput = actuatorInterfaz->getStream().str();
-        std::string expectedOutput = "setTimeStep(1100ms);loadContainer(1,1000ml);loadContainer(2,0ml);loadContainer(3,0ml);measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,4ml/h);setContinuosFlow(2,3,4ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,7.33333ml/h);setContinuosFlow(2,3,7.33333ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,12.2222ml/h);setContinuosFlow(2,3,12.2222ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,18.3333ml/h);setContinuosFlow(2,3,18.3333ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,24.4444ml/h);setContinuosFlow(2,3,24.4444ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,28.5185ml/h);setContinuosFlow(2,3,28.5185ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,28.5185ml/h);setContinuosFlow(2,3,28.5185ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,23.7654ml/h);setContinuosFlow(2,3,23.7654ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,21.785ml/h);setContinuosFlow(2,3,21.785ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,21.785ml/h);setContinuosFlow(2,3,21.785ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,23.6004ml/h);setContinuosFlow(2,3,23.6004ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,23.6004ml/h);setContinuosFlow(2,3,23.6004ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,22.617ml/h);setContinuosFlow(2,3,22.617ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,22.617ml/h);setContinuosFlow(2,3,22.617ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,23.5594ml/h);setContinuosFlow(2,3,23.5594ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,23.5594ml/h);setContinuosFlow(2,3,23.5594ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,24.5411ml/h);setContinuosFlow(2,3,24.5411ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,24.5411ml/h);setContinuosFlow(2,3,24.5411ml/h);timeStep();measureOD(2,2s,2Hz,650nm);setContinuosFlow(1,2,24.5411ml/h);setContinuosFlow(2,3,24.5411ml/h);timeStep();stopContinuosFlow(1,2);stopContinuosFlow(2,3);timeStep();";
+        std::string expectedOutput = "setTimeStep(1100ms);loadContainer(1,1000ml);loadContainer(2,0ml);loadContainer(3,0ml);measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,4ml/h);setContinuosFlow(2,3,4ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,7.33333ml/h);setContinuosFlow(2,3,7.33333ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,12.2222ml/h);setContinuosFlow(2,3,12.2222ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,18.3333ml/h);setContinuosFlow(2,3,18.3333ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,24.4444ml/h);setContinuosFlow(2,3,24.4444ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,28.5185ml/h);setContinuosFlow(2,3,28.5185ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,28.5185ml/h);setContinuosFlow(2,3,28.5185ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,23.7654ml/h);setContinuosFlow(2,3,23.7654ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,21.785ml/h);setContinuosFlow(2,3,21.785ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,21.785ml/h);setContinuosFlow(2,3,21.785ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,23.6004ml/h);setContinuosFlow(2,3,23.6004ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,23.6004ml/h);setContinuosFlow(2,3,23.6004ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,22.617ml/h);setContinuosFlow(2,3,22.617ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,22.617ml/h);setContinuosFlow(2,3,22.617ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,23.5594ml/h);setContinuosFlow(2,3,23.5594ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,23.5594ml/h);setContinuosFlow(2,3,23.5594ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,24.5411ml/h);setContinuosFlow(2,3,24.5411ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,24.5411ml/h);setContinuosFlow(2,3,24.5411ml/h);timeStep();measureOD(2,2s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,24.5411ml/h);setContinuosFlow(2,3,24.5411ml/h);timeStep();stopContinuosFlow(1,2);stopContinuosFlow(2,3);timeStep();";
         qDebug() << "generated: " << generatedOutput.c_str();
         qDebug() << "expectd:" << expectedOutput.c_str();
 
@@ -179,13 +181,15 @@ void ProtocolGraphTest::whileIfProtocol() {
 
 void ProtocolGraphTest::nestedIfsProtocol() {
     try {
-        std::shared_ptr<ProtocolGraph> protocol = createsNestedIfsProtocol();
+        int endBlockId;
+        std::shared_ptr<ProtocolGraph> protocol = createsNestedIfsProtocol(endBlockId);
         qDebug() << protocol->toString().c_str();
 
         for(int ctrId : protocol->getControlOperations()) {
             std::shared_ptr<ControlNode> ctrPtr = protocol->getControlNode(ctrId);
-            QVERIFY2(ctrPtr->getEndBlockId().back() == 12,
-                     std::string(std::to_string(ctrId) + " end block is not 12 is" + std::to_string(ctrPtr->getEndBlockId().back())).c_str());
+            QVERIFY2(ctrPtr->getEndBlockId().back() == endBlockId,
+                     std::string(std::to_string(ctrId) + " end block is not " + std::to_string(endBlockId) + "is" +
+                                 std::to_string(ctrPtr->getEndBlockId().back())).c_str());
         }
 
         StringActuatorsInterface* actuatorInterfaz = new StringActuatorsInterface(std::vector<double>{4});
@@ -193,7 +197,7 @@ void ProtocolGraphTest::nestedIfsProtocol() {
 
         qDebug() << "var = 4";
         std::string generatedOutput4 = actuatorInterfaz->getStream().str();
-        std::string expectedOutput4 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);setContinuosFlow(1,2,0ml/h);timeStep();";
+        std::string expectedOutput4 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,0ml/h);timeStep();";
         qDebug() << "generated: " << generatedOutput4.c_str();
         qDebug() << "expectd:" << expectedOutput4.c_str();
 
@@ -205,7 +209,7 @@ void ProtocolGraphTest::nestedIfsProtocol() {
 
         qDebug() << "var = 3";
         std::string generatedOutput3 = actuatorInterfaz->getStream().str();
-        std::string expectedOutput3 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);setContinuosFlow(1,2,300ml/h);timeStep();";
+        std::string expectedOutput3 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,300ml/h);timeStep();";
         qDebug() << "generated: " << generatedOutput3.c_str();
         qDebug() << "expectd:" << expectedOutput3.c_str();
 
@@ -217,7 +221,7 @@ void ProtocolGraphTest::nestedIfsProtocol() {
 
         qDebug() << "var = 2";
         std::string generatedOutput2 = actuatorInterfaz->getStream().str();
-        std::string expectedOutput2 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);setContinuosFlow(2,3,300ml/h);timeStep();";
+        std::string expectedOutput2 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(2,3,300ml/h);timeStep();";
         qDebug() << "generated: " << generatedOutput2.c_str();
         qDebug() << "expectd:" << expectedOutput2.c_str();
 
@@ -229,7 +233,7 @@ void ProtocolGraphTest::nestedIfsProtocol() {
 
         qDebug() << "var = -1";
         std::string generatedOutput1 = actuatorInterfaz->getStream().str();
-        std::string expectedOutput1 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);setContinuosFlow(2,3,0ml/h);timeStep();";
+        std::string expectedOutput1 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(2,3,0ml/h);timeStep();";
         qDebug() << "generated: " << generatedOutput1.c_str();
         qDebug() << "expectd:" << expectedOutput1.c_str();
 
@@ -242,12 +246,13 @@ void ProtocolGraphTest::nestedIfsProtocol() {
 
 void ProtocolGraphTest::sequentialIfsProtocol() {
     try {
-        std::shared_ptr<ProtocolGraph> protocol = createsSequentialIfsProtocol();
+        int eb1,eb2;
+        std::shared_ptr<ProtocolGraph> protocol = createsSequentialIfsProtocol(eb1, eb2);
         qDebug() << protocol->toString().c_str();
 
         for(int ctrId : protocol->getControlOperations()) {
             std::shared_ptr<ControlNode> ctrPtr = protocol->getControlNode(ctrId);
-            QVERIFY2((ctrPtr->getEndBlockId().back() == 8) || (ctrPtr->getEndBlockId().back() == 14),
+            QVERIFY2((ctrPtr->getEndBlockId().back() == eb1) || (ctrPtr->getEndBlockId().back() == eb2),
                      std::string(std::to_string(ctrId) + " end block is not 14 or 8 is" + std::to_string(ctrPtr->getEndBlockId().back())).c_str());
         }
 
@@ -256,7 +261,7 @@ void ProtocolGraphTest::sequentialIfsProtocol() {
 
         qDebug() << "var = 4";
         std::string generatedOutput4 = actuatorInterfaz->getStream().str();
-        std::string expectedOutput4 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);setContinuosFlow(1,2,300ml/h);setContinuosFlow(2,3,300ml/h);timeStep();";
+        std::string expectedOutput4 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,300ml/h);setContinuosFlow(2,3,300ml/h);timeStep();";
         qDebug() << "generated: " << generatedOutput4.c_str();
         qDebug() << "expectd:" << expectedOutput4.c_str();
 
@@ -268,7 +273,7 @@ void ProtocolGraphTest::sequentialIfsProtocol() {
 
         qDebug() << "var = 1";
         std::string generatedOutput1 = actuatorInterfaz->getStream().str();
-        std::string expectedOutput1 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);setContinuosFlow(1,2,300ml/h);setContinuosFlow(2,3,400ml/h);timeStep();";
+        std::string expectedOutput1 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,300ml/h);setContinuosFlow(2,3,400ml/h);timeStep();";
         qDebug() << "generated: " << generatedOutput1.c_str();
         qDebug() << "expectd:" << expectedOutput1.c_str();
 
@@ -280,7 +285,7 @@ void ProtocolGraphTest::sequentialIfsProtocol() {
 
         qDebug() << "var = 7";
         std::string generatedOutput7 = actuatorInterfaz->getStream().str();
-        std::string expectedOutput7 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);setContinuosFlow(1,2,400ml/h);setContinuosFlow(2,3,300ml/h);timeStep();";
+        std::string expectedOutput7 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(1,2,400ml/h);setContinuosFlow(2,3,300ml/h);timeStep();";
         qDebug() << "generated: " << generatedOutput7.c_str();
         qDebug() << "expectd:" << expectedOutput7.c_str();
 
@@ -293,12 +298,13 @@ void ProtocolGraphTest::sequentialIfsProtocol() {
 
 void ProtocolGraphTest::IfsWhilesProtocol() {
     try {
-        std::shared_ptr<ProtocolGraph> protocol = createsIfsWhilesProtocol();
+        int eb;
+        std::shared_ptr<ProtocolGraph> protocol = createsIfsWhilesProtocol(eb);
         qDebug() << protocol->toString().c_str();
 
         for(int ctrId : protocol->getControlOperations()) {
             std::shared_ptr<ControlNode> ctrPtr = protocol->getControlNode(ctrId);
-            QVERIFY2(ctrPtr->getEndBlockId().back() == 11,
+            QVERIFY2(ctrPtr->getEndBlockId().back() == eb,
                      std::string(std::to_string(ctrId) + " end block is not 11 is" + std::to_string(ctrPtr->getEndBlockId().back())).c_str());
         }
 
@@ -307,7 +313,7 @@ void ProtocolGraphTest::IfsWhilesProtocol() {
 
         qDebug() << "var = 1";
         std::string generatedOutput4 = actuatorInterfaz->getStream().str();
-        std::string expectedOutput4 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);setContinuosFlow(4,5,300ml/h);setContinuosFlow(4,5,300ml/h);setContinuosFlow(4,5,300ml/h);timeStep();";
+        std::string expectedOutput4 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(4,5,300ml/h);setContinuosFlow(4,5,300ml/h);setContinuosFlow(4,5,300ml/h);timeStep();";
         qDebug() << "generated: " << generatedOutput4.c_str();
         qDebug() << "expectd:" << expectedOutput4.c_str();
 
@@ -319,7 +325,7 @@ void ProtocolGraphTest::IfsWhilesProtocol() {
 
         qDebug() << "var = 2";
         std::string generatedOutput2 = actuatorInterfaz->getStream().str();
-        std::string expectedOutput2 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);setContinuosFlow(4,5,300ml/h);setContinuosFlow(4,5,300ml/h);setContinuosFlow(4,5,300ml/h);setContinuosFlow(4,5,300ml/h);setContinuosFlow(4,5,300ml/h);timeStep();";
+        std::string expectedOutput2 = "setTimeStep(1100ms);measureOD(2,4s,2Hz,650nm);getMeasureOD(2);setContinuosFlow(4,5,300ml/h);setContinuosFlow(4,5,300ml/h);setContinuosFlow(4,5,300ml/h);setContinuosFlow(4,5,300ml/h);setContinuosFlow(4,5,300ml/h);timeStep();";
         qDebug() << "generated: " << generatedOutput2.c_str();
         qDebug() << "expectd:" << expectedOutput2.c_str();
 
@@ -389,6 +395,28 @@ void ProtocolGraphTest::opertationsProtocol() {
     }
 }
 
+void ProtocolGraphTest::finishProtocol() {
+    try {
+        std::shared_ptr<ProtocolGraph> protocol = createFinishProtocol();
+        qDebug() << protocol->toString().c_str();
+
+        std::vector<double> measureValue = {300};
+        StringActuatorsInterface* actuatorInterfaz = new StringActuatorsInterface(measureValue);
+        executeProtocol(protocol,actuatorInterfaz);
+
+        std::string generatedOutput = actuatorInterfaz->getStream().str();
+        std::string expectedOutput =  "setTimeStep(1100ms);measureOD(cell,3s,2Hz,650nm);timeStep();timeStep();timeStep();getMeasureOD(cell);timeStep();";
+        qDebug() << "generated: " << generatedOutput.c_str();
+        qDebug() << "expectd:" << expectedOutput.c_str();
+
+        QVERIFY2(expectedOutput.compare(generatedOutput) == 0,
+                 "expected and generated outputs are not the same, check debug printed values for more info");
+        delete actuatorInterfaz;
+    } catch (std::exception & e) {
+        QFAIL(std::string("Exception occired, message:" + std::string(e.what())).c_str());
+    }
+}
+
 /*
  * setTimeStep(1100ms);
  * epsilon = 0.1;
@@ -439,6 +467,9 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsTurbidostatProtocol() {
 
     int op7 = graphPtr->emplaceMeasureOD("2", "od", MF::getNum(2), units::s, MF::getNum(2), units::Hz, MF::getNum(650), units::nm); //od = measureOd(2)
     graphPtr->appendOperations(op7);
+
+    int finishOD = graphPtr->emplaceFinishOperation(op7);
+    graphPtr->appendOperations(finishOD);
 
     std::shared_ptr<MathematicOperable> normOD = graphPtr->getVariable("normOD");
     std::shared_ptr<MathematicOperable> od = graphPtr->getVariable("od");
@@ -616,7 +647,7 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsWhileIfProtocol() {
  * timeStep();
  *
  */
-std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsNestedIfsProtocol() {
+std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsNestedIfsProtocol(int & endBlockId) {
     std::shared_ptr<ProtocolGraph> graphPtr = std::make_shared<ProtocolGraph>("nested_ifs");
 
     int setTimeS = graphPtr->emplaceSetTimeStep(MF::getNum(1100), units::ms);
@@ -624,6 +655,9 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsNestedIfsProtocol() {
 
     int op1 = graphPtr->emplaceMeasureOD("2","var", MF::getNum(4000), units::ms, MF::getNum(2), units::Hz, MF::getNum(650), units::nm);//var = MeasureOd()
     graphPtr->appendOperations(op1);
+
+    int finisOp1 = graphPtr->emplaceFinishOperation(op1);
+    graphPtr->appendOperations(finisOp1);
 
     std::shared_ptr<ComparisonOperable> comp1 = BF::big(graphPtr->getVariable("var"), MF::getNum(2)); //if(var > 2)
     graphPtr->startIfBlock(comp1);
@@ -660,6 +694,8 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsNestedIfsProtocol() {
     int timeStep = graphPtr->emplaceTimeStep();
     graphPtr->appendOperations(timeStep);
 
+    endBlockId = timeStep;
+
     return graphPtr;
 }
 
@@ -686,7 +722,7 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsNestedIfsProtocol() {
  * timeStep()
  *
  */
-std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsSequentialIfsProtocol() {
+std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsSequentialIfsProtocol(int & eb1, int & eb2) {
     std::shared_ptr<ProtocolGraph> graphPtr = std::make_shared<ProtocolGraph>("sequential_ifs");
 
     int setTimeS = graphPtr->emplaceSetTimeStep(MF::getNum(1100), units::ms);
@@ -694,6 +730,9 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsSequentialIfsProtocol()
 
     int op1 = graphPtr->emplaceMeasureOD("2","var", MF::getNum(4000), units::ms, MF::getNum(2), units::Hz, MF::getNum(650), units::nm);//var = MeasureOd()
     graphPtr->appendOperations(op1);
+
+    int finishOp1 = graphPtr->emplaceFinishOperation(op1);
+    graphPtr->appendOperations(finishOp1);
 
     std::shared_ptr<ComparisonOperable> comp1 = BF::less(graphPtr->getVariable("var"), MF::getNum(5)); //if(var < 5)
     graphPtr->startIfBlock(comp1);
@@ -714,8 +753,18 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsSequentialIfsProtocol()
 
     graphPtr->endIfBlock();
 
+    std::unordered_set<int> ctrNodesB(graphPtr->getControlOperations());
+
     std::shared_ptr<ComparisonOperable> comp3 = BF::big(graphPtr->getVariable("var"), MF::getNum(2)); //if(var > 2)
     graphPtr->startIfBlock(comp3);
+
+    std::unordered_set<int> ctrNodesA(graphPtr->getControlOperations());
+
+    for(int a : ctrNodesA) {
+        if (ctrNodesB.find(a) == ctrNodesB.end()) {
+            eb1 = a;
+        }
+    }
 
     int op5 = graphPtr->emplaceSetContinuousFlow("2","3",MF::getNum(300), units::ml / units::hr);
     graphPtr->appendOperations(op5);
@@ -735,6 +784,8 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsSequentialIfsProtocol()
 
     int timeStep = graphPtr->emplaceTimeStep();
     graphPtr->appendOperations(timeStep);
+
+    eb2 = timeStep;
 
     return graphPtr;
 }
@@ -757,7 +808,7 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsSequentialIfsProtocol()
  * }
  * timeStep();
  */
-std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsIfsWhilesProtocol() {
+std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsIfsWhilesProtocol(int & eb) {
     std::shared_ptr<ProtocolGraph> graphPtr = std::make_shared<ProtocolGraph>("ifs_whiles");
 
     int setTimeS = graphPtr->emplaceSetTimeStep(MF::getNum(1100), units::ms);
@@ -765,6 +816,9 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsIfsWhilesProtocol() {
 
     int op1 = graphPtr->emplaceMeasureOD("2","var", MF::getNum(4000), units::ms, MF::getNum(2), units::Hz, MF::getNum(650), units::nm);//var = MeasureOd()
     graphPtr->appendOperations(op1);
+
+    int finishOp1 = graphPtr->emplaceFinishOperation(op1);
+    graphPtr->appendOperations(finishOp1);
 
     int op2 = graphPtr->emplaceAssignation("cont", MF::getNum(0));
     graphPtr->appendOperations(op2);
@@ -800,6 +854,8 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createsIfsWhilesProtocol() {
 
     int timeStep = graphPtr->emplaceTimeStep();
     graphPtr->appendOperations(timeStep);
+
+    eb = timeStep;
 
     return graphPtr;
 }
@@ -906,6 +962,69 @@ std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createOperationsProtocol() {
 
     int LC5 = graphPtr->emplaceLoadContainer("0", graphPtr->getVariable("prime503"), units::ml);
     graphPtr->appendOperations(LC5);
+
+    return graphPtr;
+}
+
+/*
+ * setTimeStep(1100ms);
+ * executing = 0;
+ *
+ * while(t <= 4s) {
+ *  if (t >= 0s && t <= 3s) {
+ *      if (!executing) {
+ *          startMeasureOd(cell,od,3s,2Hz,650nm);
+ *          executing = 1;
+ *      }
+ *  } else if (executing) {
+ *      od = getMeasureOd(cell);
+ *      executing = 0;
+ *  }
+ *  timeStep();
+ * }
+ *
+ */
+std::shared_ptr<ProtocolGraph> ProtocolGraphTest::createFinishProtocol() {
+    std::shared_ptr<ProtocolGraph> graphPtr = std::make_shared<ProtocolGraph>("operations");
+
+    std::shared_ptr<VariableEntry> vTime = graphPtr->getTimeVariable();
+    std::shared_ptr<VariableEntry> executingFlag = graphPtr->getVariable("executing");
+
+    int setTimeS = graphPtr->emplaceSetTimeStep(MF::getNum(1100), units::ms);
+    graphPtr->setStartNode(setTimeS);
+
+    int initFlag = graphPtr->emplaceAssignation("executing", MF::getNum(0));
+    graphPtr->appendOperations(initFlag);
+
+    graphPtr->startLoopBlock(BF::lessEq(vTime, MF::getNum(4000)));
+
+    std::shared_ptr<ComparisonOperable> ifCmp = BF::makeAnd(BF::bigEq(vTime,MF::getNum(0)), BF::lessEq(vTime, MF::getNum(3000)));
+    graphPtr->startIfBlock(ifCmp);
+
+    graphPtr->startIfBlock(BF::equal(executingFlag, MF::getNum(0)));
+
+    int measureOd = graphPtr->emplaceMeasureOD("cell", "od", MF::getNum(3), units::s, MF::getNum(2), units::Hz, MF::getNum(650), units::nm);
+    graphPtr->appendOperations(measureOd);
+
+    int setFlag = graphPtr->emplaceAssignation("executing", MF::getNum(1));
+    graphPtr->appendOperations(setFlag);
+
+    graphPtr->endIfBlock();
+
+    graphPtr->startElIfBlock(BF::equal(executingFlag, MF::getNum(1)));
+
+    int finishOp = graphPtr->emplaceFinishOperation(measureOd);
+    graphPtr->appendOperations(finishOp);
+
+    int unsetFlag = graphPtr->emplaceAssignation("executing", MF::getNum(0));
+    graphPtr->appendOperations(unsetFlag);
+
+    graphPtr->endIfBlock();
+
+    int timeStep = graphPtr->emplaceTimeStep();
+    graphPtr->appendOperations(timeStep);
+
+    graphPtr->endLoopBlock();
 
     return graphPtr;
 }

@@ -14,17 +14,31 @@ public:
     virtual ~StringActuatorsInterface();
 
     virtual void applyLigth(const std::string & sourceId, units::Length wavelength, units::LuminousIntensity intensity);
+    virtual void stopApplyLigth(const std::string & sourceId);
+
     virtual void applyTemperature(const std::string & sourceId, units::Temperature temperature);
+    virtual void stopApplyTemperature(const std::string & sourceId);
+
     virtual void stir(const std::string & idSource, units::Frequency intensity);
+    virtual void stopStir(const std::string & idSource);
 
     virtual units::Volume getVirtualVolume(const std::string & sourceId);
     virtual void loadContainer(const std::string & sourceId, units::Volume initialVolume);
 
-    virtual double measureOD(const std::string & sourceId, units::Time duration, units::Frequency measurementFrequency, units::Length wavelength);
-    virtual units::Temperature measureTemperature(const std::string & sourceId, units::Time duration, units::Frequency measurementFrequency);
-    virtual units::LuminousIntensity measureLuminiscense(const std::string & sourceId, units::Time duration, units::Frequency measurementFrequency);
-    virtual units::Volume measureVolume(const std::string & sourceId, units::Time duration, units::Frequency measurementFrequency);
-    virtual units::LuminousIntensity measureFluorescence(const std::string & sourceId, units::Time duration, units::Frequency measurementFrequency);
+    virtual void startMeasureOD(const std::string & sourceId, units::Time duration, units::Frequency measurementFrequency, units::Length wavelength);
+    virtual double getMeasureOD(const std::string & sourceId);
+
+    virtual void startMeasureTemperature(const std::string & sourceId, units::Time duration, units::Frequency measurementFrequency);
+    virtual units::Temperature getMeasureTemperature(const std::string & sourceId);
+
+    virtual void startMeasureLuminiscense(const std::string & sourceId, units::Time duration, units::Frequency measurementFrequency);
+    virtual units::LuminousIntensity getMeasureLuminiscense(const std::string & sourceId);
+
+    virtual void startMeasureVolume(const std::string & sourceId, units::Time duration, units::Frequency measurementFrequency);
+    virtual units::Volume getMeasureVolume(const std::string & sourceId);
+
+    virtual void startMeasureFluorescence(const std::string & sourceId, units::Time duration, units::Frequency measurementFrequency);
+    virtual units::LuminousIntensity getMeasureFluorescence(const std::string & sourceId);
 
     virtual void mix(const std::string & idSource1,
                      const std::string & idSource2,
