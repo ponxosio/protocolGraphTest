@@ -35,6 +35,31 @@ void StringActuatorsInterface::stopStir(const std::string & idSource) {
     stream << "stopStir(" << idSource << ");";
 }
 
+void StringActuatorsInterface::centrifugate(const std::string & idSource, units::Frequency intensity) {
+    stream << "centrifugate(" << idSource << "," << intensity.to(units::Hz) << "Hz);";
+}
+
+void StringActuatorsInterface::stopCentrifugate(const std::string & idSource) {
+    stream << "stopCentrifugate(" << idSource << ");";
+}
+
+void StringActuatorsInterface::shake(const std::string & idSource, units::Frequency intensity) {
+    stream << "shake(" << idSource << "," << intensity.to(units::Hz) << "Hz);";
+}
+
+void StringActuatorsInterface::stopShake(const std::string & idSource) {
+    stream << "stopShake(" << idSource << ");";
+}
+
+void StringActuatorsInterface::startElectrophoresis(const std::string & idSource, units::ElectricField fieldStrenght) {
+    stream << "startElectrophoresis(" << idSource << "," << fieldStrenght.to(units::V / units::cm) << "V/cm);";
+}
+
+ElectrophoresisResult StringActuatorsInterface::stopElectrophoresis(const std::string & idSource) {
+    stream << "stopElectrophoresis(" << idSource << ");";
+    return ElectrophoresisResult();
+}
+
 units::Volume StringActuatorsInterface::getVirtualVolume(const std::string & sourceId) {
     stream << "getVirtualVolume(" << sourceId << ");";
     return -1*units::l;
@@ -46,10 +71,10 @@ void StringActuatorsInterface::loadContainer(const std::string & sourceId, units
 
 void StringActuatorsInterface::startMeasureOD(
         const std::string & sourceId,
-        units::Time duration, units::Frequency measurementFrequency,
+        units::Frequency measurementFrequency,
         units::Length wavelength)
 {
-    stream << "measureOD(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz,"
+    stream << "measureOD(" << sourceId << "," << measurementFrequency.to(units::Hz) << "Hz,"
            << wavelength.to(units::nm) << "nm);";
 }
 
@@ -60,10 +85,9 @@ double StringActuatorsInterface::getMeasureOD(const std::string & sourceId) {
 
 void StringActuatorsInterface::startMeasureTemperature(
         const std::string & sourceId,
-        units::Time duration,
         units::Frequency measurementFrequency)
 {
-    stream << "measureTemperature(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz);";
+    stream << "measureTemperature(" << sourceId << "," << measurementFrequency.to(units::Hz) << "Hz);";
 }
 
 units::Temperature StringActuatorsInterface::getMeasureTemperature(const std::string & sourceId) {
@@ -73,10 +97,9 @@ units::Temperature StringActuatorsInterface::getMeasureTemperature(const std::st
 
 void StringActuatorsInterface::startMeasureLuminiscense(
         const std::string & sourceId,
-        units::Time duration,
         units::Frequency measurementFrequency)
 {
-    stream << "measureLuminiscense(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz);";
+    stream << "measureLuminiscense(" << sourceId << ","  << measurementFrequency.to(units::Hz) << "Hz);";
 }
 
 units::LuminousIntensity StringActuatorsInterface::getMeasureLuminiscense(const std::string & sourceId) {
@@ -86,10 +109,9 @@ units::LuminousIntensity StringActuatorsInterface::getMeasureLuminiscense(const 
 
 void StringActuatorsInterface::startMeasureVolume(
         const std::string & sourceId,
-        units::Time duration,
         units::Frequency measurementFrequency)
 {
-    stream << "measureVolume(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz);";
+    stream << "measureVolume(" << sourceId << ","  << measurementFrequency.to(units::Hz) << "Hz);";
 }
 
 units::Volume StringActuatorsInterface::getMeasureVolume(const std::string & sourceId) {
@@ -99,10 +121,12 @@ units::Volume StringActuatorsInterface::getMeasureVolume(const std::string & sou
 
 void StringActuatorsInterface::startMeasureFluorescence(
         const std::string & sourceId,
-        units::Time duration,
-        units::Frequency measurementFrequency)
+        units::Frequency measurementFrequency,
+        units::Length excitation,
+        units::Length emission)
 {
-    stream << "measureFluorescence(" << sourceId << "," << duration.to(units::s) << "s," << measurementFrequency.to(units::Hz) << "Hz);";
+    stream << "measureFluorescence(" << sourceId << "," << measurementFrequency.to(units::Hz) << "Hz,"
+           << excitation.to(units::nm) << "nm, " << emission.to(units::nm) << "nm);";
 }
 
 units::LuminousIntensity StringActuatorsInterface::getMeasureFluorescence(const std::string & sourceId) {
@@ -110,7 +134,7 @@ units::LuminousIntensity StringActuatorsInterface::getMeasureFluorescence(const 
     return getNextReadValue()*units::cd;
 }
 
-void StringActuatorsInterface::mix(
+units::Time StringActuatorsInterface::mix(
         const std::string & idSource1,
         const std::string & idSource2,
         const std::string & idTarget,
@@ -118,6 +142,15 @@ void StringActuatorsInterface::mix(
         units::Volume volume2)
 {
     stream << "mix(" << idSource1 << "," << idSource2 << "," << idTarget << "," << volume1.to(units::ml) << "ml," << volume2.to(units::ml) << ");";
+    return (volume1.to(units::ml) * units::s + volume2.to(units::ml) * units::s);
+}
+
+void StringActuatorsInterface::stopMix(
+        const std::string & idSource1,
+        const std::string & idSource2,
+        const std::string & idTarget)
+{
+    stream << "stopMix(" << idSource1 << "," << idSource2 << "," << idTarget << ");";
 }
 
 void StringActuatorsInterface::setContinuosFlow(
@@ -133,22 +166,27 @@ void StringActuatorsInterface::stopContinuosFlow(const std::string & idSource, c
     stream << "stopContinuosFlow(" << idSource << "," << idTarget << ");";
 }
 
-void StringActuatorsInterface::transfer(
+units::Time StringActuatorsInterface::transfer(
         const std::string & idSource,
         const std::string & idTarget,
         units::Volume volume)
 {
     stream << "transfer(" << idSource << "," << idTarget << "," << volume.to(units::ml) << "ml" << ");";
+    return (volume.to(units::ml) * units::s);
+}
+
+void StringActuatorsInterface::stopTransfer(const std::string & idSource, const std::string & idTarget) {
+    stream << "stopTransfer(" << idSource << "," << idTarget << ");";
 }
 
 void StringActuatorsInterface::setTimeStep(units::Time time) {
     stream << "setTimeStep(" << time.to(units::ms) << "ms" << ");";
-    timeSlice = time.to(units::ms);
+    timeSlice = time;
 }
 
 units::Time StringActuatorsInterface::timeStep() {
     stream << "timeStep();";
-    return timeSlice * units::s;
+    return timeSlice;
 }
 
 double StringActuatorsInterface::getNextReadValue() {
